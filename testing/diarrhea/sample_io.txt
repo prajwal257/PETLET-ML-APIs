@@ -1,0 +1,6 @@
+{
+  "Age": "4",
+  "Consistency": "1",
+  "Blood_presence": "0",
+  "Diet_changes": "1",
+}
