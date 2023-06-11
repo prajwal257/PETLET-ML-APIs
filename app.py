@@ -6,7 +6,6 @@ from data_class import *
 import tensorflow as tf
 from random import randint
 import uuid
-import cv2
 import numpy as np
 import warnings
 from keras.models import load_model
@@ -100,9 +99,9 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     # Predicting from CNN.
     file.filename = f"{uuid.uuid4()}.jpg"
     contents = await file.read()
-    with open(f"{IMAGEDIR}{file.filename}", "wb") as f:
+    with open(f"./images/eyeinfection/{file.filename}", "wb") as f:
         f.write(contents)
-    image = "./images/" + file.filename
+    image = "./images/eyeinfection/" + file.filename
     image = cv2.imread(image)
     resize = tf.image.resize(image, (256,256))
     cnn_prediction = eyeinfection_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0]
