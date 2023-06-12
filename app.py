@@ -48,8 +48,8 @@ def predict(data : diarrhea_class):
     blood_presence = int(data.Blood_presence)
     diet_changes = int(data.Diet_changes)
     prediction = int(diarrhea_classifier.predict([[age, consistency, blood_presence, diet_changes]]))
-    diarrhea_data.loc[len(diarrhea_data.index)] = [age, consistency, blood_presence, diet_changes, prediction, "NA"]
-    diarrhea_data.to_csv('user_data/diarrhea.csv')
+    # diarrhea_data.loc[len(diarrhea_data.index)] = [age, consistency, blood_presence, diet_changes, prediction, "NA"]
+    # diarrhea_data.to_csv('user_data/diarrhea.csv')
     return {"prediction": prediction}
 
 # Jaundice API running at "/predict/jaundice/"
