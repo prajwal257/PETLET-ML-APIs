@@ -1,9 +1,10 @@
 from pydantic import BaseModel
 class diarrhea_class(BaseModel):
-    Age : int
-    Consistency : int
-    Blood_presence : int
-    Diet_changes : int
+    age : int
+    blood_presence : int
+    consistency : int
+    diet_changes : int
+    breed : int
 
 class jaundice_class(BaseModel):
     vomiting               : int

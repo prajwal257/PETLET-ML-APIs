@@ -1,4 +1,2 @@
-,age, consistency, blood_presence, diet_changes, predicted, actual
-0,4,1,0,1,0,NA
-1,4,1,0,1,0,NA
-2,0,0,0,0,0,NA
+, Age(months),Blood_presence,Consistency,Diet_changes,Breed,Prediction,Actual
+0,6,0,2,0,11,0,NA

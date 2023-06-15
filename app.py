@@ -8,6 +8,7 @@ from random import randint
 import uuid
 import numpy as np
 import warnings
+import cv2
 from keras.models import load_model
 from fastapi.middleware.cors import CORSMiddleware
 warnings.filterwarnings("ignore")
@@ -43,14 +44,22 @@ def main():
 # Diarrhea API running at "/predict/diarrhea/"
 @app.post('/predict/diarrhea')
 def predict(data : diarrhea_class):
-    age = int(data.Age)
-    consistency = int(data.Consistency)
-    blood_presence = int(data.Blood_presence)
-    diet_changes = int(data.Diet_changes)
-    prediction = int(diarrhea_classifier.predict([[age, consistency, blood_presence, diet_changes]]))
+    age = int(data.age)
+    blood_presence = int(data.blood_presence)
+    consistency = int(data.consistency)
+    diet_changes = int(data.diet_changes)
+    breed = int(data.breed)
+    prediction = int(diarrhea_classifier.predict([[age, blood_presence, consistency, diet_changes, breed]]))
+    diarrhea_data.loc[len(diarrhea_data.index)] = [age, blood_presence, consistency, diet_changes, breed, prediction, "NA"]
+    diarrhea_data.to_csv('user_data/diarrhea.csv')
+    return {"prediction": prediction}
+    # age = int(data.Age)
+    # consistency = int(data.Consistency)
+    # diet_changes = int(data.Diet_changes)
+    # prediction = int(diarrhea_classifier.predict([[age, consistency, blood_presence, diet_changes]]))
     # diarrhea_data.loc[len(diarrhea_data.index)] = [age, consistency, blood_presence, diet_changes, prediction, "NA"]
     # diarrhea_data.to_csv('user_data/diarrhea.csv')
-    return {"prediction": prediction}
+    # return {"prediction": prediction}
 
 # Jaundice API running at "/predict/jaundice/"
 @app.post('/predict/jaundice')
