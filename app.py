@@ -8,7 +8,7 @@ from random import randint
 import uuid
 import numpy as np
 import warnings
-# import cv2
+import cv2
 from keras.models import load_model
 from fastapi.middleware.cors import CORSMiddleware
 warnings.filterwarnings("ignore")
@@ -21,6 +21,8 @@ jaundice_data = pd.read_csv("user_data/jaundice.csv")
 eyeinfection_cnn_data = pd.read_csv("user_data/eyeinfection_cnn.csv")
 eyeinfection_ml_data = pd.read_csv("user_data/eyeinfection_ml.csv")
 obesity_data = pd.read_csv("user_data/obesity.csv")
+earinfection_data = pd.read_csv("user_data/earinfection.csv")
+toothinfection_data = pd.read_csv("user_data/toothinfection.csv")
 
 app = FastAPI()
 
@@ -36,6 +38,10 @@ eyeinfection_ml_classifier = pickle.load(pickle_in)
 eyeinfection_cnn_classifier = load_model('./models/eyeinfection_cnn.h5')
 # Loading Obesity Model here.
 obesity_classifier = load_model('./models/obesity_classifier.h5')
+# Loading Ear Infection Model here.
+earinfection_classifier = load_model('./models/earinfection.h5')
+# Loading Tooth Infection Model here.
+toothinfection_classifier = load_model('./models/toothinfection.h5')
 
 @app.get('/')
 def main():
@@ -101,6 +107,44 @@ async def create_upload_file(file: UploadFile = File(...)):
     # obesity_data.loc[len(obesity_data.index)] = [file.filename, cnn_prediction, "NA"]
     # obesity_data.to_csv('user_data/obesity.csv')
     return {"prediction": cnn_prediction}
+    
+# Ear Infection API running at "predict/earinfection/"
+@app.post("/predict/earinfection")
+async def create_upload_file(file: UploadFile = File(...)):
+    # Predicting from CNN.
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()
+    with open(f"images/earinfection/{file.filename}", "wb") as f:
+        f.write(contents)
+    image = "./images/earinfection/" + file.filename
+    image = cv2.imread(image)
+    resize = tf.image.resize(image, (256,256))
+    cnn_prediction = earinfection_classifier.predict(np.expand_dims(resize/255, 0))[0]
+    print("CNN Prediction: ", cnn_prediction)
+    cnn_prediction = str(cnn_prediction)
+    # making the dataframe from perdiction.
+    # obesity_data.loc[len(obesity_data.index)] = [file.filename, cnn_prediction, "NA"]
+    # obesity_data.to_csv('user_data/obesity.csv')
+    return {"prediction": cnn_prediction}
+
+# Ear Infection API running at "predict/earinfection/"
+@app.post("/predict/toothinfection")
+async def create_upload_file(file: UploadFile = File(...)):
+    # Predicting from CNN.
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()
+    with open(f"images/toothinfection/{file.filename}", "wb") as f:
+        f.write(contents)
+    image = "./images/toothinfection/" + file.filename
+    image = cv2.imread(image)
+    resize = tf.image.resize(image, (256,256))
+    cnn_prediction = toothinfection_classifier.predict(np.expand_dims(resize/255, 0))[0]
+    print("CNN Prediction: ", cnn_prediction)
+    cnn_prediction = str(cnn_prediction)
+    # making the dataframe from perdiction.
+    # obesity_data.loc[len(obesity_data.index)] = [file.filename, cnn_prediction, "NA"]
+    # obesity_data.to_csv('user_data/obesity.csv')
+    return {"prediction": cnn_prediction}
 
 # Eyeinfection API running at "predict/eyeinfection"
 @app.post("/predict/eyeinfection")
@@ -131,3 +175,4 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     # eyeinfection_ml_data.to_csv('ml_dataset.csv')
     return {"prediction": prediction}
  
+
