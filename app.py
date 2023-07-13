@@ -56,8 +56,8 @@ def predict(data : diarrhea_class):
     diet_changes = int(data.diet_changes)
     breed = int(data.breed)
     prediction = int(diarrhea_classifier.predict([[age, blood_presence, consistency, diet_changes, breed]]))
-    diarrhea_data.loc[len(diarrhea_data.index)] = [age, blood_presence, consistency, diet_changes, breed, prediction, "NA"]
-    diarrhea_data.to_csv('user_data/diarrhea.csv')
+    # diarrhea_data.loc[len(diarrhea_data.index)] = [age, blood_presence, consistency, diet_changes, breed, prediction, "NA"]
+    # diarrhea_data.to_csv('user_data/diarrhea.csv')
     return {"prediction": prediction}
     # age = int(data.Age)
     # consistency = int(data.Consistency)
