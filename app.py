@@ -8,7 +8,7 @@ from random import randint
 import uuid
 import numpy as np
 import warnings
-# import cv2
+import cv2
 from keras.models import load_model
 from fastapi.middleware.cors import CORSMiddleware
 warnings.filterwarnings("ignore")
