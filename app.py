@@ -15,15 +15,6 @@ warnings.filterwarnings("ignore")
 
 IMAGEDIR = "images/"
 
-# Importing the user_data files for merging the new user data.
-diarrhea_data = pd.read_csv("user_data/diarrhea.csv")
-jaundice_data = pd.read_csv("user_data/jaundice.csv")
-eyeinfection_cnn_data = pd.read_csv("user_data/eyeinfection_cnn.csv")
-eyeinfection_ml_data = pd.read_csv("user_data/eyeinfection_ml.csv")
-obesity_data = pd.read_csv("user_data/obesity.csv")
-earinfection_data = pd.read_csv("user_data/earinfection.csv")
-toothinfection_data = pd.read_csv("user_data/toothinfection.csv")
-
 app = FastAPI()
 
 # Loading diarrhea Model here.
@@ -42,6 +33,11 @@ obesity_classifier = load_model('./models/obesity_classifier.h5')
 earinfection_classifier = load_model('./models/earinfection.h5')
 # Loading Tooth Infection Model here.
 toothinfection_classifier = load_model('./models/toothinfection.h5')
+# Loading Flea-Infection Model here.
+pickle_in = open("./models/fleas_cnn_model.pkl", "rb")
+fleasinfection_cnn_classifier = pickle.load(pickle_in)
+pickle_in = open("./models/fleas_ml_model.pkl", "rb")
+fleasinfection_ml_classifier = pickle.load(pickle_in)
 
 @app.get('/')
 def main():
@@ -50,43 +46,47 @@ def main():
 # Diarrhea API running at "/predict/diarrhea/"
 @app.post('/predict/diarrhea')
 def predict(data : diarrhea_class):
-    age = int(data.age)
-    blood_presence = int(data.blood_presence)
-    consistency = int(data.consistency)
-    diet_changes = int(data.diet_changes)
-    breed = int(data.breed)
-    prediction = int(diarrhea_classifier.predict([[age, blood_presence, consistency, diet_changes, breed]]))
-    # diarrhea_data.loc[len(diarrhea_data.index)] = [age, blood_presence, consistency, diet_changes, breed, prediction, "NA"]
-    # diarrhea_data.to_csv('user_data/diarrhea.csv')
+    age             = int(data.age)
+    blood_presence  = int(data.blood_presence)
+    consistency     = int(data.consistency)
+    diet_changes    = int(data.diet_changes)
+    breed           = int(data.breed)
+    prediction      = int(diarrhea_classifier.predict([[age, blood_presence, consistency, diet_changes, breed]]))
+    diarrhea_data   = open("user_data/diarrhea.txt", "a")
+    new_row         = str(age) + ", " + str(blood_presence) + ", " + str(data.consistency) + ", " +  \
+                        str(data.diet_changes) + ", " + str(data.breed) + ", " + str(prediction) + ", NA \n" 
+    print(new_row)
+    diarrhea_data.write('\n' + (new_row))
+    diarrhea_data.close()
     return {"prediction": prediction}
-    # age = int(data.Age)
-    # consistency = int(data.Consistency)
-    # diet_changes = int(data.Diet_changes)
-    # prediction = int(diarrhea_classifier.predict([[age, consistency, blood_presence, diet_changes]]))
-    # diarrhea_data.loc[len(diarrhea_data.index)] = [age, consistency, blood_presence, diet_changes, prediction, "NA"]
-    # diarrhea_data.to_csv('user_data/diarrhea.csv')
-    # return {"prediction": prediction}
 
 # Jaundice API running at "/predict/jaundice/"
 @app.post('/predict/jaundice')
 def predict(data : jaundice_class):
-    vomiting              = int(data.vomiting)  
-    diarrhoea             = int(data.diarrhoea)  
-    lethargy              = int(data.lethargy)  
-    fever                 = float(data.fever)
-    abdominal_pain        = int(data.abdominal_pain)  
-    loss_of_appetite      = int(data.loss_of_appetite)  
-    paleness              = int(data.paleness)  
-    yellowish_skin        = int(data.yellowish_skin)  
-    change_in_urine_feces = int(data.change_in_urine_feces)  
-    polyuria              = int(data.polyuria)  
-    polydipsia            = int(data.polydipsia)  
-    mental_confusion      = int(data.mental_confusion)  
-    weight_loss           = float(data.weight_loss)
-    bleeding              = int(data.bleeding)  
-    prediction = int(jaundice_classifier.predict([[vomiting, diarrhoea, lethargy, fever, abdominal_pain, loss_of_appetite, paleness, yellowish_skin, change_in_urine_feces, polyuria, polydipsia, mental_confusion, weight_loss, bleeding]]))
-    # jaundice_data.loc[len(jaundice_data.index)] = [vomiting, diarrhoea, lethargy, fever, abdominal_pain, loss_of_appetite, paleness, yellowish_skin, change_in_urine_feces, polyuria, polydipsia, mental_confusion, weight_loss,bleeding, prediction, "NA"]
-    # jaundice_data.to_csv('user_data/jaundice.csv', index=False)
+    vomiting                    = int(data.vomiting)  
+    diarrhoea                   = int(data.diarrhoea)  
+    lethargy                    = int(data.lethargy)  
+    fever                       = float(data.fever)
+    abdominal_pain              = int(data.abdominal_pain)  
+    loss_of_appetite            = int(data.loss_of_appetite)  
+    paleness                    = int(data.paleness)  
+    yellowish_skin              = int(data.yellowish_skin)  
+    change_in_urine_feces       = int(data.change_in_urine_feces)  
+    polyuria                    = int(data.polyuria)  
+    polydipsia                  = int(data.polydipsia)  
+    mental_confusion            = int(data.mental_confusion)  
+    weight_loss                 = float(data.weight_loss)
+    bleeding                    = int(data.bleeding)  
+    prediction                  = int(jaundice_classifier.predict([[vomiting, diarrhoea, lethargy, fever, abdominal_pain, loss_of_appetite, paleness, yellowish_skin, change_in_urine_feces, polyuria, polydipsia, mental_confusion, weight_loss, bleeding]]))
+    jaundice_data               = open("user_data/jaundice.txt", "a")
+    new_row                     = str(vomiting) + ", " + str(diarrhoea) + ", " + str(lethargy) + ", " + str(fever) + ", " + \
+                                    str(abdominal_pain) + ", " +  str(loss_of_appetite) + ", " + str(paleness) + ", " + \
+                                    str(yellowish_skin) + ", " +  str(change_in_urine_feces) + ", " + str(polyuria) + ", " + \
+                                    str(polydipsia) + ", " + str(mental_confusion) + ", " + str(weight_loss) + ", " + str(bleeding) + ", " + \
+                                    str(prediction) + ", NA \n" 
+    print(new_row)
+    jaundice_data.write('\n' + (new_row))
+    jaundice_data.close()
     return {"prediction": prediction}
 
 # Obesity API running at "predict/obesity/"
@@ -103,9 +103,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     cnn_prediction = obesity_classifier.predict(np.expand_dims(resize/255, 0))[0]
     print("CNN Prediction: ", cnn_prediction)
     cnn_prediction = str(cnn_prediction)
-    # making the dataframe from perdiction.
-    # obesity_data.loc[len(obesity_data.index)] = [file.filename, cnn_prediction, "NA"]
-    # obesity_data.to_csv('user_data/obesity.csv')
+    obesity_data = open("user_data/obesity.txt", "a")
+    new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
+    print(new_row)
+    obesity_data.write('\n' + (new_row))
+    obesity_data.close()
     return {"prediction": cnn_prediction}
     
 # Ear Infection API running at "predict/earinfection/"
@@ -122,9 +124,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     cnn_prediction = earinfection_classifier.predict(np.expand_dims(resize/255, 0))[0]
     print("CNN Prediction: ", cnn_prediction)
     cnn_prediction = str(cnn_prediction)
-    # making the dataframe from perdiction.
-    # obesity_data.loc[len(obesity_data.index)] = [file.filename, cnn_prediction, "NA"]
-    # obesity_data.to_csv('user_data/obesity.csv')
+    earinfection_data = open("user_data/earinfection.txt", "a")
+    new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
+    print(new_row)
+    earinfection_data.write('\n' + (new_row))
+    earinfection_data.close()
     return {"prediction": cnn_prediction}
 
 # Ear Infection API running at "predict/earinfection/"
@@ -141,9 +145,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     cnn_prediction = toothinfection_classifier.predict(np.expand_dims(resize/255, 0))[0]
     print("CNN Prediction: ", cnn_prediction)
     cnn_prediction = str(cnn_prediction)
-    # making the dataframe from perdiction.
-    # obesity_data.loc[len(obesity_data.index)] = [file.filename, cnn_prediction, "NA"]
-    # obesity_data.to_csv('user_data/obesity.csv')
+    toothinfection_data = open("user_data/toothinfection.txt", "a")
+    new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
+    print(new_row)
+    toothinfection_data.write('\n' + (new_row))
+    toothinfection_data.close()
     return {"prediction": cnn_prediction}
 
 # Eyeinfection API running at "predict/eyeinfection"
@@ -158,8 +164,11 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     image = cv2.imread(image)
     resize = tf.image.resize(image, (256,256))
     cnn_prediction = eyeinfection_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0]
-    # eyeinfection_cnn_data.loc[len(eyeinfection_cnn_data.index)] = [file.filename, cnn_prediction, "NA"]
-    # eyeinfection_cnn_data.to_csv('eyeinfection_cnn.csv')
+    eyeinfection_cnn_data = open("user_data/eyeinfection_cnn.txt", "a")
+    new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
+    print(new_row)
+    eyeinfection_cnn_data.write('\n' + (new_row))
+    eyeinfection_cnn_data.close()
     print("CNN Prediction: ", cnn_prediction)
     # Predicting from ML Model.
     age = int(data.Age)
@@ -171,8 +180,53 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     ml_prediction = (eyeinfection_ml_classifier.predict([[age, breed, sex, redness, swelling, discharge]])[0])
     print("ML Prediction: ", ml_prediction)
     prediction = str(ml_prediction + cnn_prediction)
-    # eyeinfection_ml_data.loc[len(eyeinfection_ml_data.index)] = [age, breed, sex, redness, swelling, discharge, prediction, "NA"]
-    # eyeinfection_ml_data.to_csv('ml_dataset.csv')
+    eyeinfection_ml_data = open("user_data/eyeinfection_ml.txt", "a")
+    new_row = str(age) + ", " + str(breed) + ", " + str(sex) + ", " +  \
+                str(redness) + ", " + str(swelling) + ", " + str(discharge) + ", " + str(prediction) + ", NA \n" 
+    print(new_row)
+    eyeinfection_ml_data.write('\n' + (new_row))
+    eyeinfection_ml_data.close()
     return {"prediction": prediction}
- 
 
+
+# Eyeinfection API running at "predict/fleasinfection"
+@app.post("/predict/fleasinfection")
+async def create_upload_file(data: fleas_infection_data = Depends(), file: UploadFile = File(...)):
+    # Predicting from CNN.
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()
+    with open(f"./images/fleasinfection/{file.filename}", "wb") as f:
+        f.write(contents)
+    image = "./images/fleasinfection/" + file.filename
+    image = cv2.imread(image)
+    resize = tf.image.resize(image, (256,256))
+    cnn_prediction = fleasinfection_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0]
+    fleasinfection_cnn_data = open("user_data/fleasinfection_cnn.txt", "a")
+    new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
+    print(new_row)
+    fleasinfection_cnn_data.write('\n' + (new_row))
+    fleasinfection_cnn_data.close()
+    print("CNN Prediction: ", cnn_prediction)
+    # Predicting from ML Model.
+    itchingandscratching = int(data.itchingandscratching)
+    hairlossorbaldpatches = int(data.hairlossorbaldpatches)
+    redorinflamedskin = int(data.redorinflamedskin)
+    fleadirtorfleaeggs = int(data.fleadirtorfleaeggs)
+    biteorscratchwounds = int(data.biteorscratchwounds)
+    coatlength = int(data.coatlength)
+    coattype = int(data.coattype)
+    currentseason = int(data.currentseason)
+    location = int(data.location)
+    ml_prediction = (fleasinfection_ml_classifier.predict([[itchingandscratching, hairlossorbaldpatches, redorinflamedskin, 
+                            fleadirtorfleaeggs, biteorscratchwounds, coatlength, coattype, currentseason, location]])[0])
+    print("ML Prediction: ", ml_prediction)
+    prediction = str(ml_prediction + cnn_prediction)
+    fleasinfection_ml_data = open("user_data/fleasinfection_ml.txt", "a")
+    new_row = str(itchingandscratching) + ", " + str(hairlossorbaldpatches) + ", " + str(redorinflamedskin) + ", " +  \
+                str(fleadirtorfleaeggs) + ", " + str(biteorscratchwounds) + ", " + str(coatlength) + ", " +  \
+                str(coattype) + ", " + str(currentseason) + ", " + str(location) + ", " + str(prediction) + ", NA \n" 
+    print(new_row)
+    fleasinfection_ml_data.write('\n' + (new_row))
+    fleasinfection_ml_data.close()
+    prediction = str(ml_prediction + cnn_prediction)
+    return {"prediction": prediction}

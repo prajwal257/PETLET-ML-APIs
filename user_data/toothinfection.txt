@@ -1,0 +1,2 @@
+image_name, predicted_value, actual_value
+427264ff-e9d8-4ba6-80ff-b69566fa9653.jpg, [0.00597966], NA 

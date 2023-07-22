@@ -1,0 +1,2 @@
+Age(months),Blood_presence,Consistency,Diet_changes,Breed,Prediction,Actual \n
+6, 1, 2, 1, 11, 1, NA 

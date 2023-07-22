@@ -33,3 +33,14 @@ class eye_infection_class(BaseModel):
     Redness : int
     Swelling : int
     Discharge : int
+
+class fleas_infection_data(BaseModel):
+    itchingandscratching : int
+    hairlossorbaldpatches : int
+    redorinflamedskin : int
+    fleadirtorfleaeggs : int
+    biteorscratchwounds : int
+    coatlength : int
+    coattype : int
+    currentseason : int
+    location : int
