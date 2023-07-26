@@ -38,6 +38,11 @@ pickle_in = open("./models/fleas_cnn_model.pkl", "rb")
 fleasinfection_cnn_classifier = pickle.load(pickle_in)
 pickle_in = open("./models/fleas_ml_model.pkl", "rb")
 fleasinfection_ml_classifier = pickle.load(pickle_in)
+# Loading Constipation Model here.
+pickle_in = open("./models/constipation_cnn.pkl", "rb")
+constipation_cnn_classifier = pickle.load(pickle_in)
+pickle_in = open("./models/constipation_ml.pkl", "rb")
+constipation_ml_classifier = pickle.load(pickle_in)
 
 @app.get('/')
 def main():
@@ -189,7 +194,7 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     return {"prediction": prediction}
 
 
-# Eyeinfection API running at "predict/fleasinfection"
+# Flea Infection API running at "predict/fleasinfection"
 @app.post("/predict/fleasinfection")
 async def create_upload_file(data: fleas_infection_data = Depends(), file: UploadFile = File(...)):
     # Predicting from CNN.
@@ -228,5 +233,43 @@ async def create_upload_file(data: fleas_infection_data = Depends(), file: Uploa
     print(new_row)
     fleasinfection_ml_data.write('\n' + (new_row))
     fleasinfection_ml_data.close()
+    prediction = str(ml_prediction + cnn_prediction)
+    return {"prediction": prediction}
+
+
+# Constipation API running at "predict/constipation"
+@app.post("/predict/constipation")
+async def create_upload_file(data: constipation_class = Depends(), file: UploadFile = File(...)):
+    # Predicting from CNN.
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()
+    with open(f"./images/constipation/{file.filename}", "wb") as f:
+        f.write(contents)
+    image = "./images/constipation/" + file.filename
+    image = cv2.imread(image)
+    resize = tf.image.resize(image, (256,256))
+    cnn_prediction = constipation_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0]
+    constipation_cnn_data = open("user_data/constipation_cnn.txt", "a")
+    new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
+    print(new_row)
+    constipation_cnn_data.write('\n' + (new_row))
+    constipation_cnn_data.close()
+    print("CNN Prediction: ", cnn_prediction)
+    # Predicting from ML Model.
+    infrequent_or_absent_bowel_movements = int(data.infrequent_or_absent_bowel_movements)
+    small_hard_dry_stools = int(data.small_hard_dry_stools)
+    visible_discomfort_in_abdomen = int(data.visible_discomfort_in_abdomen)
+    lack_of_appetite = int(data.lack_of_appetite)
+    lethargy_or_unusual_behavior = int(data.lethargy_or_unusual_behavior)
+    vomiting = int(data.vomiting)
+    ml_prediction = (constipation_ml_classifier.predict([[infrequent_or_absent_bowel_movements, small_hard_dry_stools, visible_discomfort_in_abdomen, 
+                            lack_of_appetite, lethargy_or_unusual_behavior, vomiting]])[0])
+    print("ML Prediction: ", ml_prediction)
+    constipation_ml_data = open("user_data/constipation_ml.txt", "a")
+    new_row = str(infrequent_or_absent_bowel_movements) + ", " + str(small_hard_dry_stools) + ", " + str(visible_discomfort_in_abdomen) + ", " +  \
+                str(lack_of_appetite) + ", " + str(lethargy_or_unusual_behavior) + ", " + str(vomiting) + ", " +  ", NA \n" 
+    print(new_row)
+    constipation_ml_data.write('\n' + (new_row))
+    constipation_ml_data.close()
     prediction = str(ml_prediction + cnn_prediction)
     return {"prediction": prediction}
