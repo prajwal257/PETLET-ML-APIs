@@ -36,6 +36,7 @@ toothinfection_classifier = load_model('./models/toothinfection.h5')
 # Loading Flea-Infection Model here.
 pickle_in = open("./models/fleas_ml_model.pkl", "rb")
 fleasinfection_ml_classifier = pickle.load(pickle_in)
+fleasinfection_cnn_classifier = load_model('./models/fleas_cnn_model.h5')
 # Loading Constipation Model here.
 pickle_in = open("./models/constipation_ml.pkl", "rb")
 constipation_ml_classifier = pickle.load(pickle_in)
