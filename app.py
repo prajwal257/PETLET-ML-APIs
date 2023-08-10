@@ -34,15 +34,12 @@ earinfection_classifier = load_model('./models/earinfection.h5')
 # Loading Tooth Infection Model here.
 toothinfection_classifier = load_model('./models/toothinfection.h5')
 # Loading Flea-Infection Model here.
-pickle_in = open("./models/fleas_cnn_model.pkl", "rb")
-fleasinfection_cnn_classifier = pickle.load(pickle_in)
 pickle_in = open("./models/fleas_ml_model.pkl", "rb")
 fleasinfection_ml_classifier = pickle.load(pickle_in)
 # Loading Constipation Model here.
-pickle_in = open("./models/constipation_cnn.pkl", "rb")
-constipation_cnn_classifier = pickle.load(pickle_in)
 pickle_in = open("./models/constipation_ml.pkl", "rb")
 constipation_ml_classifier = pickle.load(pickle_in)
+constipation_cnn_classifier = load_model('./models/constipation_cnn.h5')
 
 @app.get('/')
 def main():
