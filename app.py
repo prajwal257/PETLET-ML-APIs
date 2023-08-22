@@ -5,6 +5,7 @@ import pickle
 from data_class import *
 import tensorflow as tf
 from random import randint
+import json
 import uuid
 import numpy as np
 import warnings
@@ -42,6 +43,32 @@ pickle_in = open("./models/constipation_ml.pkl", "rb")
 constipation_ml_classifier = pickle.load(pickle_in)
 constipation_cnn_classifier = load_model('./models/constipation_cnn.h5')
 
+# Loading the Medicines Data here.
+constipation_medicine_data = ""
+with open('./medicines/constipation/medicine_data.json', 'r') as f: 
+    constipation_medicine_data = json.load(f)
+diarrheoa_medicine_data = ""
+with open('./medicines/diarrhoea/medicine_data.json', 'r') as f: 
+    diarrheoa_medicine_data = json.load(f)
+ear_infection_medicine_data = ""
+with open('./medicines/ear_infection/medicine_data.json', 'r') as f: 
+    ear_infection_medicine_data = json.load(f)
+eye_infection_medicine_data = ""
+with open('./medicines/eye_infection/medicine_data.json', 'r') as f: 
+    eye_infection_medicine_data = json.load(f)
+fleas_infection_medicine_data = ""
+with open('./medicines/fleas_infection/medicine_data.json', 'r') as f: 
+    fleas_infection_medicine_data = json.load(f)
+jaundice_medicine_data = ""
+with open('./medicines/jaundice/medicine_data.json', 'r') as f: 
+    jaundice_medicine_data = json.load(f)
+obesity_medicine_data = ""
+with open('./medicines/obesity/medicine_data.json', 'r') as f: 
+    obesity_medicine_data = json.load(f)
+tooth_infection_medicine_data = ""
+with open('./medicines/tooth_infection/medicine_data.json', 'r') as f: 
+    tooth_infection_medicine_data = json.load(f)
+
 @app.get('/')
 def main():
     return {'message': 'Call the `/predict/<disease>` to start the prediction with the data.!'}
@@ -61,7 +88,11 @@ def predict(data : diarrhea_class):
     print(new_row)
     diarrhea_data.write('\n' + (new_row))
     diarrhea_data.close()
-    return {"prediction": prediction}
+    if(prediction > 0.5):
+        # Return the prediction with medicines.
+        return [{"prediction": prediction}, {"medicine_data": diarrheoa_medicine_data}]
+    else:
+        return {"prediction": prediction}
 
 # Jaundice API running at "/predict/jaundice/"
 @app.post('/predict/jaundice')
@@ -90,7 +121,11 @@ def predict(data : jaundice_class):
     print(new_row)
     jaundice_data.write('\n' + (new_row))
     jaundice_data.close()
-    return {"prediction": prediction}
+    if(prediction > 0.5):
+        # Return the prediction with medicines.
+        return [{"prediction": prediction}, {"medicine_data": jaundice_medicine_data}]
+    else:
+        return {"prediction": prediction}
 
 # Obesity API running at "predict/obesity/"
 @app.post("/predict/obesity")
@@ -105,13 +140,18 @@ async def create_upload_file(file: UploadFile = File(...)):
     resize = tf.image.resize(image, (256,256))
     cnn_prediction = obesity_classifier.predict(np.expand_dims(resize/255, 0))[0]
     print("CNN Prediction: ", cnn_prediction)
-    cnn_prediction = str(cnn_prediction)
+    size_of_prediction = len(str(cnn_prediction))
+    cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
     obesity_data = open("user_data/obesity.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
     obesity_data.write('\n' + (new_row))
     obesity_data.close()
-    return {"prediction": cnn_prediction}
+    if(float(cnn_prediction) > 0.5):
+        # Return the prediction with medicines.
+        return [{"prediction": cnn_prediction}, {"medicine_data": obesity_medicine_data}]
+    else:
+        return {"prediction": cnn_prediction}
     
 # Ear Infection API running at "predict/earinfection/"
 @app.post("/predict/earinfection")
@@ -126,13 +166,18 @@ async def create_upload_file(file: UploadFile = File(...)):
     resize = tf.image.resize(image, (256,256))
     cnn_prediction = earinfection_classifier.predict(np.expand_dims(resize/255, 0))[0]
     print("CNN Prediction: ", cnn_prediction)
-    cnn_prediction = str(cnn_prediction)
+    size_of_prediction = len(str(cnn_prediction))
+    cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
     earinfection_data = open("user_data/earinfection.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
     earinfection_data.write('\n' + (new_row))
     earinfection_data.close()
-    return {"prediction": cnn_prediction}
+    if(float(cnn_prediction) > 0.5):
+        # Return the prediction with medicines.
+        return [{"prediction": cnn_prediction}, {"medicine_data": ear_infection_medicine_data}]
+    else:
+        return {"prediction": cnn_prediction}
 
 # Ear Infection API running at "predict/earinfection/"
 @app.post("/predict/toothinfection")
@@ -147,13 +192,18 @@ async def create_upload_file(file: UploadFile = File(...)):
     resize = tf.image.resize(image, (256,256))
     cnn_prediction = toothinfection_classifier.predict(np.expand_dims(resize/255, 0))[0]
     print("CNN Prediction: ", cnn_prediction)
-    cnn_prediction = str(cnn_prediction)
+    size_of_prediction = len(str(cnn_prediction))
+    cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
     toothinfection_data = open("user_data/toothinfection.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
     toothinfection_data.write('\n' + (new_row))
     toothinfection_data.close()
-    return {"prediction": cnn_prediction}
+    if(float(cnn_prediction) > 0.5):
+        # Return the prediction with medicines.
+        return [{"prediction": cnn_prediction}, {"medicine_data": tooth_infection_medicine_data}]
+    else:
+        return {"prediction": cnn_prediction}
 
 # Eyeinfection API running at "predict/eyeinfection"
 @app.post("/predict/eyeinfection")
@@ -173,6 +223,9 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     eyeinfection_cnn_data.write('\n' + (new_row))
     eyeinfection_cnn_data.close()
     print("CNN Prediction: ", cnn_prediction)
+    size_of_prediction = len(str(cnn_prediction))
+    cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
+    cnn_prediction = float(cnn_prediction)
     # Predicting from ML Model.
     age = int(data.Age)
     breed = int(data.Breed)
@@ -182,14 +235,18 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     discharge = int(data.Discharge)
     ml_prediction = (eyeinfection_ml_classifier.predict([[age, breed, sex, redness, swelling, discharge]])[0])
     print("ML Prediction: ", ml_prediction)
-    prediction = str(ml_prediction + cnn_prediction)
     eyeinfection_ml_data = open("user_data/eyeinfection_ml.txt", "a")
     new_row = str(age) + ", " + str(breed) + ", " + str(sex) + ", " +  \
-                str(redness) + ", " + str(swelling) + ", " + str(discharge) + ", " + str(prediction) + ", NA \n" 
+                str(redness) + ", " + str(swelling) + ", " + str(discharge) + ", " + str(ml_prediction) + ", NA \n" 
     print(new_row)
     eyeinfection_ml_data.write('\n' + (new_row))
     eyeinfection_ml_data.close()
-    return {"prediction": prediction}
+    prediction = ml_prediction + cnn_prediction
+    if(float(prediction) > 0.85):
+        # Return the prediction with medicines.
+        return [{"prediction": prediction}, {"medicine_data": eye_infection_medicine_data}]
+    else:
+        return {"prediction": prediction}
 
 
 # Flea Infection API running at "predict/fleasinfection"
@@ -203,12 +260,15 @@ async def create_upload_file(data: fleas_infection_data = Depends(), file: Uploa
     image = "./images/fleasinfection/" + file.filename
     image = cv2.imread(image)
     resize = tf.image.resize(image, (256,256))
-    cnn_prediction = fleasinfection_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0]
+    cnn_prediction = str(fleasinfection_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0])
     fleasinfection_cnn_data = open("user_data/fleasinfection_cnn.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
     fleasinfection_cnn_data.write('\n' + (new_row))
     fleasinfection_cnn_data.close()
+    size_of_prediction = len(str(cnn_prediction))
+    cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
+    cnn_prediction = float(cnn_prediction)
     print("CNN Prediction: ", cnn_prediction)
     # Predicting from ML Model.
     itchingandscratching = int(data.itchingandscratching)
@@ -231,8 +291,12 @@ async def create_upload_file(data: fleas_infection_data = Depends(), file: Uploa
     print(new_row)
     fleasinfection_ml_data.write('\n' + (new_row))
     fleasinfection_ml_data.close()
-    prediction = str(ml_prediction + cnn_prediction)
-    return {"prediction": prediction}
+    prediction = ml_prediction + cnn_prediction
+    if(float(prediction) > 0.85):
+        # Return the prediction with medicines.
+        return [{"prediction": prediction}, {"medicine_data": fleas_infection_medicine_data}]
+    else:
+        return {"prediction": prediction}
 
 
 # Constipation API running at "predict/constipation"
@@ -246,7 +310,10 @@ async def create_upload_file(data: constipation_class = Depends(), file: UploadF
     image = "./images/constipation/" + file.filename
     image = cv2.imread(image)
     resize = tf.image.resize(image, (256,256))
-    cnn_prediction = constipation_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0]
+    cnn_prediction = str(constipation_cnn_classifier.predict(np.expand_dims(resize/255, 0))[0])
+    size_of_prediction = len(str(cnn_prediction))
+    cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
+    cnn_prediction = float(cnn_prediction)
     constipation_cnn_data = open("user_data/constipation_cnn.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
@@ -269,5 +336,9 @@ async def create_upload_file(data: constipation_class = Depends(), file: UploadF
     print(new_row)
     constipation_ml_data.write('\n' + (new_row))
     constipation_ml_data.close()
-    prediction = str(ml_prediction + cnn_prediction)
-    return {"prediction": prediction}
+    prediction = (ml_prediction + cnn_prediction)
+    if(float(prediction) > 0.85):
+        # Return the prediction with medicines.
+        return [{"prediction": prediction}, {"medicine_data": fleas_infection_medicine_data}]
+    else:
+        return {"prediction": prediction}
