@@ -86,11 +86,11 @@ def predict(data : diarrhea_class):
     new_row         = str(age) + ", " + str(blood_presence) + ", " + str(data.consistency) + ", " +  \
                         str(data.diet_changes) + ", " + str(data.breed) + ", " + str(prediction) + ", NA \n" 
     print(new_row)
-    diarrhea_data.write('\n' + (new_row))
+    diarrhea_data.write(new_row)
     diarrhea_data.close()
     if(prediction > 0.5):
         # Return the prediction with medicines.
-        return [{"prediction": prediction}, {"medicine_data": diarrheoa_medicine_data}]
+        return {"prediction": prediction, "medicine_data": diarrheoa_medicine_data}
     else:
         return {"prediction": prediction}
 
@@ -119,11 +119,11 @@ def predict(data : jaundice_class):
                                     str(polydipsia) + ", " + str(mental_confusion) + ", " + str(weight_loss) + ", " + str(bleeding) + ", " + \
                                     str(prediction) + ", NA \n" 
     print(new_row)
-    jaundice_data.write('\n' + (new_row))
+    jaundice_data.write((new_row))
     jaundice_data.close()
     if(prediction > 0.5):
         # Return the prediction with medicines.
-        return [{"prediction": prediction}, {"medicine_data": jaundice_medicine_data}]
+        return {"prediction": prediction, "medicine_data": jaundice_medicine_data}
     else:
         return {"prediction": prediction}
 
@@ -145,11 +145,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     obesity_data = open("user_data/obesity.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
-    obesity_data.write('\n' + (new_row))
+    obesity_data.write((new_row))
     obesity_data.close()
     if(float(cnn_prediction) > 0.5):
         # Return the prediction with medicines.
-        return [{"prediction": cnn_prediction}, {"medicine_data": obesity_medicine_data}]
+        return {"prediction": cnn_prediction, "medicine_data": obesity_medicine_data}
     else:
         return {"prediction": cnn_prediction}
     
@@ -171,11 +171,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     earinfection_data = open("user_data/earinfection.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
-    earinfection_data.write('\n' + (new_row))
+    earinfection_data.write((new_row))
     earinfection_data.close()
     if(float(cnn_prediction) > 0.5):
         # Return the prediction with medicines.
-        return [{"prediction": cnn_prediction}, {"medicine_data": ear_infection_medicine_data}]
+        return {"prediction": cnn_prediction, "medicine_data": ear_infection_medicine_data}
     else:
         return {"prediction": cnn_prediction}
 
@@ -197,11 +197,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     toothinfection_data = open("user_data/toothinfection.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
-    toothinfection_data.write('\n' + (new_row))
+    toothinfection_data.write((new_row))
     toothinfection_data.close()
     if(float(cnn_prediction) > 0.5):
         # Return the prediction with medicines.
-        return [{"prediction": cnn_prediction}, {"medicine_data": tooth_infection_medicine_data}]
+        return {"prediction": cnn_prediction, "medicine_data": tooth_infection_medicine_data}
     else:
         return {"prediction": cnn_prediction}
 
@@ -220,7 +220,7 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     eyeinfection_cnn_data = open("user_data/eyeinfection_cnn.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
-    eyeinfection_cnn_data.write('\n' + (new_row))
+    eyeinfection_cnn_data.write((new_row))
     eyeinfection_cnn_data.close()
     print("CNN Prediction: ", cnn_prediction)
     size_of_prediction = len(str(cnn_prediction))
@@ -244,7 +244,7 @@ async def create_upload_file(data: eye_infection_class = Depends(), file: Upload
     prediction = ml_prediction + cnn_prediction
     if(float(prediction) > 0.85):
         # Return the prediction with medicines.
-        return [{"prediction": prediction}, {"medicine_data": eye_infection_medicine_data}]
+        return {"prediction": prediction, "medicine_data": eye_infection_medicine_data}
     else:
         return {"prediction": prediction}
 
@@ -264,7 +264,7 @@ async def create_upload_file(data: fleas_infection_data = Depends(), file: Uploa
     fleasinfection_cnn_data = open("user_data/fleasinfection_cnn.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
-    fleasinfection_cnn_data.write('\n' + (new_row))
+    fleasinfection_cnn_data.write((new_row))
     fleasinfection_cnn_data.close()
     size_of_prediction = len(str(cnn_prediction))
     cnn_prediction = str(cnn_prediction)[1:(size_of_prediction-1)]
@@ -289,12 +289,12 @@ async def create_upload_file(data: fleas_infection_data = Depends(), file: Uploa
                 str(fleadirtorfleaeggs) + ", " + str(biteorscratchwounds) + ", " + str(coatlength) + ", " +  \
                 str(coattype) + ", " + str(currentseason) + ", " + str(location) + ", " + str(prediction) + ", NA \n" 
     print(new_row)
-    fleasinfection_ml_data.write('\n' + (new_row))
+    fleasinfection_ml_data.write((new_row))
     fleasinfection_ml_data.close()
     prediction = ml_prediction + cnn_prediction
     if(float(prediction) > 0.85):
         # Return the prediction with medicines.
-        return [{"prediction": prediction}, {"medicine_data": fleas_infection_medicine_data}]
+        return {"prediction": prediction, "medicine_data": fleas_infection_medicine_data}
     else:
         return {"prediction": prediction}
 
@@ -317,7 +317,7 @@ async def create_upload_file(data: constipation_class = Depends(), file: UploadF
     constipation_cnn_data = open("user_data/constipation_cnn.txt", "a")
     new_row = str(file.filename) + ", " + str(cnn_prediction) + ", NA \n" 
     print(new_row)
-    constipation_cnn_data.write('\n' + (new_row))
+    constipation_cnn_data.write((new_row))
     constipation_cnn_data.close()
     print("CNN Prediction: ", cnn_prediction)
     # Predicting from ML Model.
@@ -334,11 +334,11 @@ async def create_upload_file(data: constipation_class = Depends(), file: UploadF
     new_row = str(infrequent_or_absent_bowel_movements) + ", " + str(small_hard_dry_stools) + ", " + str(visible_discomfort_in_abdomen) + ", " +  \
                 str(lack_of_appetite) + ", " + str(lethargy_or_unusual_behavior) + ", " + str(vomiting) + ", " +  ", NA \n" 
     print(new_row)
-    constipation_ml_data.write('\n' + (new_row))
+    constipation_ml_data.write((new_row))
     constipation_ml_data.close()
     prediction = (ml_prediction + cnn_prediction)
     if(float(prediction) > 0.85):
         # Return the prediction with medicines.
-        return [{"prediction": prediction}, {"medicine_data": fleas_infection_medicine_data}]
+        return {"prediction": prediction, "medicine_data": fleas_infection_medicine_data}
     else:
         return {"prediction": prediction}
