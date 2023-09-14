@@ -29,7 +29,9 @@ pickle_in = open("models/eyeinfection_ml.pkl", "rb")
 eyeinfection_ml_classifier = pickle.load(pickle_in)
 eyeinfection_cnn_classifier = load_model('./models/eyeinfection_cnn.h5')
 # Loading Obesity Model here.
-obesity_classifier = load_model('./models/obesity_classifier.h5')
+pickle_in = open("./models/obesity_ml_model.pkl", "rb")
+obesity_ml_classifier = pickle.load(pickle_in)
+obesity_classifier = load_model('./models/obesity_cnn_model.h5')
 # Loading Ear Infection Model here.
 earinfection_classifier = load_model('./models/earinfection.h5')
 # Loading Tooth Infection Model here.
@@ -129,7 +131,7 @@ def predict(data : jaundice_class):
 
 # Obesity API running at "predict/obesity/"
 @app.post("/predict/obesity")
-async def create_upload_file(file: UploadFile = File(...)):
+async def create_upload_file(data: obesity_class = Depends(), file: UploadFile = File(...)):
     # Predicting from CNN.
     file.filename = f"{uuid.uuid4()}.jpg"
     contents = await file.read()
@@ -147,11 +149,27 @@ async def create_upload_file(file: UploadFile = File(...)):
     print(new_row)
     obesity_data.write((new_row))
     obesity_data.close()
-    if(float(cnn_prediction) > 0.5):
+    # Predicting from ML Model.
+    age = float(data.age)
+    weight = float(data.weight)
+    activity_level = int(data.activity_level)
+    appetite_level = int(data.appetite_level)
+    visible_fat_deposits = int(data.visible_fat_deposits)
+    body_shape = int(data.body_shape)
+    ml_prediction = (obesity_classifier.predict([[age, weight, activity_level, appetite_level, visible_fat_deposits, body_shape]])[0])
+    print("ML Prediction: ", ml_prediction)
+    # obesity_ml_data = open("user_data/eyeinfection_ml.txt", "a")
+    # new_row = str(age) + ", " + str(breed) + ", " + str(sex) + ", " +  \
+    #             str(redness) + ", " + str(swelling) + ", " + str(discharge) + ", " + str(ml_prediction) + ", NA \n" 
+    # print(new_row)
+    # obesity_ml_data.write('\n' + (new_row))
+    # obesity_ml_data.close()
+    prediction = ml_prediction + cnn_prediction
+    if(float(prediction) > 0.85):
         # Return the prediction with medicines.
-        return {"prediction": cnn_prediction, "medicine_data": obesity_medicine_data}
+        return {"prediction": prediction, "medicine_data": eye_infection_medicine_data}
     else:
-        return {"prediction": cnn_prediction}
+        return {"prediction": prediction}
     
 # Ear Infection API running at "predict/earinfection/"
 @app.post("/predict/earinfection")

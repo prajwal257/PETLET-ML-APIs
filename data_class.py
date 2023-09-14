@@ -52,3 +52,11 @@ class constipation_class(BaseModel):
     lack_of_appetite                    : int
     lethargy_or_unusual_behavior        : int
     vomiting                            : int
+
+class obesity_class(BaseModel):
+    age: float
+    weight: float
+    activity_level: int
+    appetite_level: int
+    visible_fat_deposits: int
+    body_shape: int
